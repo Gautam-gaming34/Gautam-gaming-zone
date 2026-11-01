@@ -185,6 +185,39 @@ window.onload = function() {
 
   let best = localStorage.getItem("bestScore") || 0;
   document.getElementById("bestScore").innerText = best;
-};  
+}; 
+<div class="card">
+  <h2>⭐ Player XP & Level</h2>
+  <h3 id="playerLevel">Level 1</h3>
+  <p id="playerXP">XP: 0 / 100</p>
+  <progress id="xpBar" value="0" max="100" style="width:100%"></progress>
+  <button onclick="addXP()">Play Game +20 XP</button>
+</div>
+
+<script>
+let xp = Number(localStorage.getItem("playerXP")) || 0;
+
+function updateXP() {
+  let level = Math.floor(xp / 100) + 1;
+  let currentXP = xp % 100;
+
+  document.getElementById("playerLevel").innerText =
+    "Level " + level;
+
+  document.getElementById("playerXP").innerText =
+    "XP: " + currentXP + " / 100";
+
+  document.getElementById("xpBar").value = currentXP;
+
+  localStorage.setItem("playerXP", xp);
+}
+
+function addXP() {
+  xp += 20;
+  updateXP();
+}
+
+updateXP();
+</script>
 </body>
 </html>
