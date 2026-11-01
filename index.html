@@ -43,7 +43,24 @@ button {
   <h3>🏆 Your Best Score</h3>
   <h1 id="bestScore">0</h1>
 </div>
-<h1>🎮 Gautam Gaming Zone</h1>
+<h1>🎮 Gautam Gaming Zone</h1> 
+  <div class="card">
+  <h2>👤 Player Profile</h2>
+
+  <input
+    type="text"
+    id="playerName"
+    placeholder="Enter Your Name"
+  >
+
+  <button onclick="savePlayer()">
+    SAVE PROFILE
+  </button>
+
+  <h3 id="welcomePlayer">
+    Welcome Player!
+  </h3>
+  </div>
 <p>Welcome Gamers!</p>
 
 <div class="card">
@@ -119,4 +136,28 @@ function play(user) {
 
 </body>
   </html>
-  
+function savePlayer() {
+  let name = document.getElementById("playerName").value.trim();
+
+  if(name === "") {
+    alert("Please Enter Your Name!");
+    return;
+  }
+
+  localStorage.setItem("playerName", name);
+
+  document.getElementById("welcomePlayer").innerText =
+    "Welcome " + name + "! 🎮";
+}
+
+window.onload = function() {
+  let name = localStorage.getItem("playerName");
+
+  if(name) {
+    document.getElementById("welcomePlayer").innerText =
+      "Welcome " + name + "! 🎮";
+  }
+
+  let best = localStorage.getItem("bestScore") || 0;
+  document.getElementById("bestScore").innerText = best;
+};  
