@@ -32,6 +32,31 @@ button {
 </style>
 </head>
 
+<div class="card">
+  <h2>🏆 GAMING LEADERBOARD</h2>
+  <div id="leaderboard">
+    <p>🥇 Loading Player...</p>
+  </div>
+  <button onclick="showMyScore()">
+    MY HIGH SCORE
+  </button>
+  <p id="myScore"></p>
+</div>
+
+<script>
+function showMyScore() {
+  let name = localStorage.getItem("playerName") || "Player";
+  let score = localStorage.getItem("bestScore") || 0;
+
+  document.getElementById("myScore").innerText =
+    name + " - " + score + " Points";
+}
+
+document.getElementById("leaderboard").innerHTML =
+  "<p>🥇 Gautam Player - Your Best Score</p>";
+</script>
+</body>
+  
 <body>
 <div class="card">
   <h2>🏆 Gaming Dashboard</h2>
