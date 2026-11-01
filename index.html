@@ -33,7 +33,16 @@ button {
 </head>
 
 <body>
-
+<div class="card">
+  <h2>🏆 Gaming Dashboard</h2>
+  <p>Welcome, Player!</p>
+  <h3>🎮 Your Games</h3>
+  <p>⚡ Tap Challenge</p>
+  <p>🔢 Number Guess</p>
+  <p>✊ Rock Paper Scissors</p>
+  <h3>🏆 Your Best Score</h3>
+  <h1 id="bestScore">0</h1>
+</div>
 <h1>🎮 Gautam Gaming Zone</h1>
 <p>Welcome Gamers!</p>
 
@@ -64,6 +73,15 @@ let score = 0;
 function tap() {
   score++;
   document.getElementById("score").innerText = score;
+
+  let best = Number(localStorage.getItem("bestScore")) || 0;
+
+  if(score > best) {
+    localStorage.setItem("bestScore", score);
+    best = score;
+  }
+
+  document.getElementById("bestScore").innerText = best;
 }
 
 let number = Math.floor(Math.random()*10)+1;
