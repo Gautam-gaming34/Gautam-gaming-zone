@@ -219,5 +219,26 @@ function addXP() {
 
 updateXP();
 </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "gautam-gaming-34.firebaseapp.com",
+    projectId: "gautam-gaming-34",
+    storageBucket: "gautam-gaming-34.firebasestorage.app",
+    messagingSenderId: "727893441914",
+    appId: "1:727893441914:web:34ed2964867049203f2ac3",
+    measurementId: "G-DEFJ22H7N1"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+</script>
 </body>
 </html>
