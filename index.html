@@ -14,6 +14,7 @@ body {
   padding: 15px;
 }
 h1 { color: #00eaff; }
+
 .card {
   background: #202044;
   padding: 25px;
@@ -21,6 +22,17 @@ h1 { color: #00eaff; }
   border-radius: 15px;
   max-width: 380px;
 }
+
+input {
+  display: block;
+  width: 90%;
+  padding: 12px;
+  margin: 12px auto;
+  border-radius: 8px;
+  border: none;
+  box-sizing: border-box;
+}
+
 button {
   background: #00eaff;
   border: 0;
@@ -28,178 +40,267 @@ button {
   border-radius: 10px;
   font-weight: bold;
   margin: 8px;
+  cursor: pointer;
 }
+
+#dashboard { display: none; }
+#message { color: #00eaff; }
 </style>
 </head>
 
-<div class="card">
-  <h2>🏆 GAMING LEADERBOARD</h2>
-  <div id="leaderboard">
-    <p>🥇 Loading Player...</p>
-  </div>
-  <button onclick="showMyScore()">
-    MY HIGH SCORE
-  </button>
-  <p id="myScore"></p>
-</div>
-
-<script>
-function showMyScore() {
-  let name = localStorage.getItem("playerName") || "Player";
-  let score = localStorage.getItem("bestScore") || 0;
-
-  document.getElementById("myScore").innerText =
-    name + " - " + score + " Points";
-}
-
-document.getElementById("leaderboard").innerHTML =
-  "<p>🥇 Gautam Player - Your Best Score</p>";
-</script>
-</body>
-  
 <body>
-<div class="card">
-  <h2>🏆 Gaming Dashboard</h2>
-  <p>Welcome, Player!</p>
-  <h3>🎮 Your Games</h3>
-  <p>⚡ Tap Challenge</p>
-  <p>🔢 Number Guess</p>
-  <p>✊ Rock Paper Scissors</p>
-  <h3>🏆 Your Best Score</h3>
-  <h1 id="bestScore">0</h1>
+
+<h1>🎮 Gautam Gaming Zone</h1>
+
+<!-- SIGNUP / LOGIN -->
+<div class="card" id="authBox">
+
+  <h2>👤 Create Account</h2>
+
+  <input id="signupName" placeholder="Enter Your Name">
+  <input id="signupEmail" type="email" placeholder="Enter Email">
+  <input id="signupPassword" type="password"
+         placeholder="Create Password">
+
+  <button id="signupBtn">SIGN UP</button>
+
+  <hr>
+
+  <h2>🔐 Login</h2>
+
+  <input id="loginEmail" type="email" placeholder="Enter Email">
+  <input id="loginPassword" type="password"
+         placeholder="Enter Password">
+
+  <button id="loginBtn">LOGIN</button>
+
+  <p id="message"></p>
 </div>
-<h1>🎮 Gautam Gaming Zone</h1> 
+
+<!-- GAMING DASHBOARD -->
+<div id="dashboard">
+
   <div class="card">
-  <h2>👤 Player Profile</h2>
-
-  <input
-    type="text"
-    id="playerName"
-    placeholder="Enter Your Name"
-  >
-
-  <button onclick="savePlayer()">
-    SAVE PROFILE
-  </button>
-
-  <h3 id="welcomePlayer">
-    Welcome Player!
-  </h3>
+    <h2>🏆 Gaming Dashboard</h2>
+    <h3 id="welcomePlayer">Welcome Player!</h3>
+    <button id="logoutBtn">LOGOUT</button>
   </div>
-<p>Welcome Gamers!</p>
 
-<div class="card">
-<h2>⚡ Tap Challenge</h2>
-<h1 id="score">0</h1>
-<button onclick="tap()">TAP HERE</button>
+  <div class="card">
+    <h2>🎮 Your Games</h2>
+    <p>⚡ Tap Challenge</p>
+    <p>🔢 Number Guess</p>
+    <p>✊ Rock Paper Scissors</p>
+  </div>
+
+  <div class="card">
+    <h2>⚡ Tap Challenge</h2>
+    <h1 id="score">0</h1>
+    <button id="tapBtn">TAP HERE</button>
+    <p>Best Score: <span id="bestScore">0</span></p>
+  </div>
+
+  <div class="card">
+    <h2>🔢 Number Guess Game</h2>
+    <input id="guess" type="number" min="1" max="10"
+           placeholder="Guess 1 to 10">
+    <button id="guessBtn">CHECK</button>
+    <p id="answer"></p>
+  </div>
+
+  <div class="card">
+    <h2>✊ Rock Paper Scissors</h2>
+    <button id="rockBtn">Rock</button>
+    <button id="paperBtn">Paper</button>
+    <button id="scissorsBtn">Scissors</button>
+    <p id="result"></p>
+  </div>
+
+  <div class="card">
+    <h2>⭐ Player XP & Level</h2>
+    <h3 id="playerLevel">Level 1</h3>
+    <p id="playerXP">XP: 0 / 100</p>
+    <progress id="xpBar" value="0" max="100"
+              style="width:100%"></progress>
+    <button id="addXPBtn">PLAY GAME +20 XP</button>
+  </div>
+
 </div>
 
-<div class="card">
-<h2>🔢 Number Guess Game</h2>
-<input id="guess" type="number" min="1" max="10">
-<button onclick="checkGuess()">CHECK</button>
-<p id="answer"></p>
-</div>
+<script type="module">
 
-<div class="card">
-<h2>✊ Rock Paper Scissors</h2>
-<button onclick="play('Rock')">Rock</button>
-<button onclick="play('Paper')">Paper</button>
-<button onclick="play('Scissors')">Scissors</button>
-<p id="result"></p>
-</div>
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-<script>
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+  updateProfile
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+// FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyCRP6MxUVKYJ52J3iuyqD868noHLkMuWOM",
+  authDomain: "gautam-gaming-34.firebaseapp.com",
+  projectId: "gautam-gaming-34",
+  storageBucket: "gautam-gaming-34.firebasestorage.app",
+  messagingSenderId: "727893441914",
+  appId: "1:727893441914:web:34ed2964867049203f2ac3",
+  measurementId: "G-DEFJ22H7N1"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const authBox = document.getElementById("authBox");
+const dashboard = document.getElementById("dashboard");
+const message = document.getElementById("message");
+
+// SIGNUP
+document.getElementById("signupBtn").onclick = async () => {
+  const name = document.getElementById("signupName").value.trim();
+  const email = document.getElementById("signupEmail").value.trim();
+  const password = document.getElementById("signupPassword").value;
+
+  if (!name || !email || !password) {
+    message.innerText = "Please fill all fields!";
+    return;
+  }
+
+  if (password.length < 6) {
+    message.innerText = "Password must be at least 6 characters.";
+    return;
+  }
+
+  try {
+    const result = await createUserWithEmailAndPassword(
+      auth, email, password
+    );
+
+    await updateProfile(result.user, {
+      displayName: name
+    });
+
+    message.innerText = "Account Created Successfully!";
+
+  } catch (error) {
+    message.innerText = error.message;
+  }
+};
+
+// LOGIN
+document.getElementById("loginBtn").onclick = async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    message.innerText = "Login Successful!";
+  } catch (error) {
+    message.innerText = error.message;
+  }
+};
+
+// LOGIN STATUS
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    authBox.style.display = "none";
+    dashboard.style.display = "block";
+
+    document.getElementById("welcomePlayer").innerText =
+      "Welcome " + (user.displayName || user.email) + "! 🎮";
+
+    loadScores();
+  } else {
+    authBox.style.display = "block";
+    dashboard.style.display = "none";
+  }
+});
+
+// LOGOUT
+document.getElementById("logoutBtn").onclick = async () => {
+  await signOut(auth);
+};
+
+// GAME 1: TAP CHALLENGE
 let score = 0;
 
-function tap() {
+function loadScores() {
+  const best = Number(localStorage.getItem("bestScore")) || 0;
+  document.getElementById("bestScore").innerText = best;
+}
+
+document.getElementById("tapBtn").onclick = () => {
   score++;
+
   document.getElementById("score").innerText = score;
 
   let best = Number(localStorage.getItem("bestScore")) || 0;
 
-  if(score > best) {
+  if (score > best) {
     localStorage.setItem("bestScore", score);
     best = score;
   }
 
   document.getElementById("bestScore").innerText = best;
-}
+};
 
-let number = Math.floor(Math.random()*10)+1;
+// GAME 2: NUMBER GUESS
+let number = Math.floor(Math.random() * 10) + 1;
 
-function checkGuess() {
-  let g = Number(document.getElementById("guess").value);
+document.getElementById("guessBtn").onclick = () => {
+  const g = Number(document.getElementById("guess").value);
 
-  if(g === number) {
+  if (g < 1 || g > 10 || !Number.isInteger(g)) {
     document.getElementById("answer").innerText =
-    "🎉 Correct! You Win!";
-    number = Math.floor(Math.random()*10)+1;
+      "Enter a number from 1 to 10!";
+  } else if (g === number) {
+    document.getElementById("answer").innerText =
+      "🎉 Correct! You Win!";
+    number = Math.floor(Math.random() * 10) + 1;
   } else {
     document.getElementById("answer").innerText =
-    "Try Again!";
+      "Try Again!";
   }
-}
+};
 
+// GAME 3: ROCK PAPER SCISSORS
 function play(user) {
-  let choices = ["Rock","Paper","Scissors"];
-  let computer = choices[Math.floor(Math.random()*3)];
+  const choices = ["Rock", "Paper", "Scissors"];
+  const computer = choices[Math.floor(Math.random() * 3)];
 
   let result = "Computer: " + computer + " | ";
 
-  if(user === computer) result += "Draw!";
-  else if(
-    (user==="Rock" && computer==="Scissors") ||
-    (user==="Paper" && computer==="Rock") ||
-    (user==="Scissors" && computer==="Paper")
+  if (user === computer) result += "Draw!";
+  else if (
+    (user === "Rock" && computer === "Scissors") ||
+    (user === "Paper" && computer === "Rock") ||
+    (user === "Scissors" && computer === "Paper")
   ) result += "You Win!";
   else result += "Computer Wins!";
 
   document.getElementById("result").innerText = result;
 }
-</script>
 
-</body>
-  </html>
-function savePlayer() {
-  let name = document.getElementById("playerName").value.trim();
+document.getElementById("rockBtn").onclick =
+  () => play("Rock");
 
-  if(name === "") {
-    alert("Please Enter Your Name!");
-    return;
-  }
+document.getElementById("paperBtn").onclick =
+  () => play("Paper");
 
-  localStorage.setItem("playerName", name);
+document.getElementById("scissorsBtn").onclick =
+  () => play("Scissors");
 
-  document.getElementById("welcomePlayer").innerText =
-    "Welcome " + name + "! 🎮";
-}
-
-window.onload = function() {
-  let name = localStorage.getItem("playerName");
-
-  if(name) {
-    document.getElementById("welcomePlayer").innerText =
-      "Welcome " + name + "! 🎮";
-  }
-
-  let best = localStorage.getItem("bestScore") || 0;
-  document.getElementById("bestScore").innerText = best;
-}; 
-<div class="card">
-  <h2>⭐ Player XP & Level</h2>
-  <h3 id="playerLevel">Level 1</h3>
-  <p id="playerXP">XP: 0 / 100</p>
-  <progress id="xpBar" value="0" max="100" style="width:100%"></progress>
-  <button onclick="addXP()">Play Game +20 XP</button>
-</div>
-
-<script>
+// PLAYER XP
 let xp = Number(localStorage.getItem("playerXP")) || 0;
 
 function updateXP() {
-  let level = Math.floor(xp / 100) + 1;
-  let currentXP = xp % 100;
+  const level = Math.floor(xp / 100) + 1;
+  const currentXP = xp % 100;
 
   document.getElementById("playerLevel").innerText =
     "Level " + level;
@@ -212,33 +313,14 @@ function updateXP() {
   localStorage.setItem("playerXP", xp);
 }
 
-function addXP() {
+document.getElementById("addXPBtn").onclick = () => {
   xp += 20;
   updateXP();
-}
+};
 
 updateXP();
-</script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import {
-    getFirestore,
-    collection,
-    getDocs
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "gautam-gaming-34.firebaseapp.com",
-    projectId: "gautam-gaming-34",
-    storageBucket: "gautam-gaming-34.firebasestorage.app",
-    messagingSenderId: "727893441914",
-    appId: "1:727893441914:web:34ed2964867049203f2ac3",
-    measurementId: "G-DEFJ22H7N1"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
 </script>
 </body>
-</html>
+  </html>
+  
