@@ -221,6 +221,32 @@ document.getElementById("loginBtn").onclick = async () => {
   }
 };
 
+async function saveBestScore() {
+  if (!currentUser) return;
+
+  try {
+    const playerRef = doc(db, "Players", currentUser.uid);
+    const oldData = await getDoc(playerRef);
+
+    const oldScore = oldData.exists()
+      ? Number(oldData.data().score) || 0
+      : 0;
+
+    const newScore = Math.floor(
+      Number(localStorage.getItem("bestScore")) || 0
+    );
+
+    await setDoc(playerRef, {
+      name: currentUser.displayName ||
+            currentUser.email.split("@")[0],
+      score: Math.max(oldScore, newScore)
+    });
+
+  } catch (error) {
+    console.log("Score Save Error:", error);
+  }
+  }
+  
 // LOGIN STATUS
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
