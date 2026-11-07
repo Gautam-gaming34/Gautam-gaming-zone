@@ -223,6 +223,7 @@ document.getElementById("loginBtn").onclick = async () => {
 
 // LOGIN STATUS
 onAuthStateChanged(auth, (user) => {
+  currentUser = user;
   if (user) {
     authBox.style.display = "none";
     dashboard.style.display = "block";
