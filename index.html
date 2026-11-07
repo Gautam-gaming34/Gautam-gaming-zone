@@ -258,6 +258,7 @@ onAuthStateChanged(auth, (user) => {
       "Welcome " + (user.displayName || user.email) + "! 🎮";
 
     loadScores();
+ saveBestScore();
   } else {
     authBox.style.display = "block";
     dashboard.style.display = "none";
